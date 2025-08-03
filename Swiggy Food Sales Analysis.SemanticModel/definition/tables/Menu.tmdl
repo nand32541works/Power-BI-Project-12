@@ -1,0 +1,72 @@
+table Menu
+	lineageTag: 64544916-fcc2-4112-b332-06d4145389f7
+
+	column Menu_id
+		dataType: string
+		lineageTag: aa584d9f-4619-4260-a687-a939f74a1fdc
+		summarizeBy: none
+		sourceColumn: Menu_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Restaurant_id
+		dataType: int64
+		formatString: 0
+		lineageTag: e1832367-c15e-4b81-b738-51e05764cc2c
+		summarizeBy: none
+		sourceColumn: Restaurant_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Food_id
+		dataType: string
+		lineageTag: 76530b48-815b-48fd-a51d-952dcb1d3a35
+		summarizeBy: none
+		sourceColumn: Food_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cuisine
+		dataType: string
+		lineageTag: b42c91df-ce3b-4c9c-a1bc-04a40c913bd1
+		summarizeBy: none
+		sourceColumn: Cuisine
+
+		annotation SummarizationSetBy = Automatic
+
+	column Price
+		dataType: int64
+		formatString: 0
+		lineageTag: d49f7483-6705-48f3-942d-007c97a28780
+		summarizeBy: sum
+		sourceColumn: Price
+
+		annotation SummarizationSetBy = Automatic
+
+	column FoodType
+		dataType: string
+		lineageTag: 659973cb-b011-42e3-9e08-4225d6fd92bb
+		summarizeBy: none
+		sourceColumn: FoodType
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Menu = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\hp\Downloads\Menu.csv"),[Delimiter=",", Columns=5, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Menu_id", type text}, {"Restaurant_id", Int64.Type}, {"Food_id", type text}, {"Cuisine", type text}, {"Price", Int64.Type}}),
+				    #"Merged Queries" = Table.NestedJoin(#"Changed Type", {"Food_id"}, Food, {"Food_id"}, "Food", JoinKind.LeftOuter),
+				    #"Expanded Food" = Table.ExpandTableColumn(#"Merged Queries", "Food", {"Food_Type"}, {"Food.Food_Type"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Expanded Food",{{"Food.Food_Type", "FoodType"}}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Renamed Columns",null,"Others",Replacer.ReplaceValue,{"FoodType"}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value","","Others",Replacer.ReplaceValue,{"FoodType"})
+				in
+				    #"Replaced Value1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

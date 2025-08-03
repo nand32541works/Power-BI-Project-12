@@ -1,0 +1,42 @@
+table Food
+	lineageTag: 5b25b484-92c3-42d2-82df-5068b0e5926a
+
+	column Food_id
+		dataType: string
+		lineageTag: c0c4efab-ea54-4afd-8f31-c80e2f6db468
+		summarizeBy: none
+		sourceColumn: Food_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Item
+		dataType: string
+		lineageTag: e52e0a21-a21f-4fb6-84ea-2b3b011c2334
+		summarizeBy: none
+		sourceColumn: Item
+
+		annotation SummarizationSetBy = Automatic
+
+	column Food_Type
+		dataType: string
+		lineageTag: b0bb912a-a868-4f51-b06c-4918bacb4b95
+		summarizeBy: none
+		sourceColumn: Food_Type
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Food = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\hp\Downloads\Food.csv"),[Delimiter=",", Columns=3, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}, {"Column2", type text}, {"Column3", type text}}),
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Changed Type", [PromoteAllScalars=true]),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers",{{"Food_id", type text}, {"Item", type text}, {"Food_Type", type text}})
+				in
+				    #"Changed Type1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

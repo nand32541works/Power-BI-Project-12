@@ -1,0 +1,35 @@
+table 'Rank Table'
+	lineageTag: b3365362-3222-4832-b09f-b234ee54d4c2
+
+	column Sort
+		formatString: 0
+		lineageTag: 43431faa-486e-4e31-87c7-991fb4eaf661
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Sort]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Type
+		lineageTag: 02cbee91-e2c8-4a97-8f44-a5d62cfdc8e8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Type]
+
+		annotation SummarizationSetBy = Automatic
+
+	column No
+		formatString: 0
+		lineageTag: 943592a3-7630-4337-963f-1f127a7e4246
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [No]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Rank Table' = calculated
+		mode: import
+		source = DATATABLE("Sort",INTEGER,"Type",STRING,"No",INTEGER,{{0,"Default",0},{1,"Top 5",5},{2,"Top 10",10},{3,"Top 20",20},{4,"Top 30",30},{5,"Top 100",100}})
+
+	annotation PBI_Id = 5fe0213de7534cd5aa0d6dcbe22956dd
+

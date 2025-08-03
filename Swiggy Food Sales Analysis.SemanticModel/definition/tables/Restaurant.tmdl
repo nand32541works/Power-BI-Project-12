@@ -1,0 +1,78 @@
+table Restaurant
+	lineageTag: c2ae53e7-9533-4d48-a382-055475b9e317
+
+	measure 'Rating Count' = COUNT(Restaurant[Rating])
+		formatString: 0
+		lineageTag: 93e54e03-b8a5-4573-b5ac-013d1f71e119
+
+	column Restaurant_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 1021d471-3c24-4574-a64a-ebfddad728e7
+		summarizeBy: none
+		sourceColumn: Restaurant_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		dataType: string
+		lineageTag: d4ad8621-0e73-47e5-a271-c40715fa78ec
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: a0e67438-652b-47bc-a22a-f8cbdabc2d66
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 7064c216-d743-4685-97c0-8a17941d4c34
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column Rating
+		dataType: string
+		lineageTag: b18daace-efa0-430c-9aca-662c51bfc656
+		summarizeBy: none
+		sourceColumn: Rating
+
+		annotation SummarizationSetBy = Automatic
+
+	column Rating_count
+		dataType: string
+		lineageTag: 779be631-d8b2-495b-ad6e-6bed6e369dd7
+		summarizeBy: none
+		sourceColumn: Rating_count
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cuisine
+		dataType: string
+		lineageTag: 192b6423-854f-4c2f-9784-97ae1468729a
+		summarizeBy: none
+		sourceColumn: Cuisine
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Restaurant = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\hp\Downloads\Restaurant.csv"),[Delimiter=",", Columns=7, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Restaurant_id", Int64.Type}, {"Name", type text}, {"Country", type text}, {"City", type text}, {"Rating", type text}, {"Rating_count", type text}, {"Cuisine", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

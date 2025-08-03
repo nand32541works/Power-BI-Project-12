@@ -1,0 +1,47 @@
+table 'All Measures'
+	lineageTag: b7f1744e-9781-4560-a01b-4ce765ba8823
+
+	measure 'Sale Value' = SUM(Orders[Value])
+		formatString: 0
+		lineageTag: b152cf1e-a92a-4aae-83fd-3b7d0cc65b6a
+
+	measure 'Top N Sales' = VAR rankValue = RANKX(ALL(Orders[City]),[Sale Value],,DESC) VAR selectedRank = SELECTEDVALUE('Rank Table'[No]) RETURN IF(selectedRank=0,[Sale Value],IF(rankValue<=selectedRank,[Sale Value],BLANK()))
+		formatString: 0
+		lineageTag: c74d4550-f99a-429a-b511-0dcea73564bd
+
+	measure 'Dynamic Title Top Sales' =
+			
+			VAR selectrank = SELECTEDVALUE ('Rank Table'[Type])
+			VAR selecttype = SELECTEDVALUE (Orders[Type])
+			return selectrank&" City "&selecttype
+		lineageTag: 7b69081d-2825-46e7-840a-87e6c311fb8c
+
+	measure 'Total Quantity Amount' = SUM(Orders[Value])
+		formatString: 0
+		lineageTag: 7b50e282-ddc4-4893-b03e-559e03d79001
+
+	measure 'Dynamic Title Year' =
+			
+			var selectedtype = SELECTEDVALUE (Orders[Type])
+			return selectedtype&" by Year"
+		lineageTag: 74aa352a-1b08-45b7-90dc-65b3fe587f57
+
+	column Column1
+		dataType: string
+		lineageTag: d020bff9-bc92-43c6-95fd-6294deffbbea
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'All Measures' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

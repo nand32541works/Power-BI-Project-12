@@ -1,0 +1,89 @@
+table Users
+	lineageTag: bf6eb493-cb11-47a4-a923-ac71b70917e6
+
+	measure 'Users count' = DISTINCTCOUNT(Users[User_id])
+		formatString: 0
+		lineageTag: 2a335ce0-d932-4854-b039-3c07146f3bea
+
+	measure Top10%Customer = CALCULATE(SUM([Total Sales]),FILTER(Users,Users[Rank]<=7793))
+		formatString: 0
+		lineageTag: e0ee8ea5-15c5-4813-b6a3-bc5725746353
+
+	column User_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 08e47446-9aae-4b2e-9167-ae3fc5bcd1ae
+		summarizeBy: none
+		sourceColumn: User_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		dataType: string
+		lineageTag: 69f45a73-02c5-4d87-a4f7-2744902ebd05
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Age
+		dataType: int64
+		formatString: 0
+		lineageTag: c588e65a-3059-4e88-866f-d02374f12dde
+		summarizeBy: none
+		sourceColumn: Age
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gender
+		dataType: string
+		lineageTag: 60ca849f-fe15-44f0-b60f-296b7781a67c
+		summarizeBy: none
+		sourceColumn: Gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Marital Status'
+		dataType: string
+		lineageTag: 1809a8f8-6627-409b-800d-f4ef65df047c
+		summarizeBy: none
+		sourceColumn: Marital Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Occupation
+		dataType: string
+		lineageTag: d1b19be6-1469-4489-a34f-09a07fce628d
+		summarizeBy: none
+		sourceColumn: Occupation
+
+		annotation SummarizationSetBy = Automatic
+
+	column Rank = RANKX(ALL(Users),[Total Sales],,DESC,Dense)
+		formatString: 0
+		lineageTag: 3666af49-f891-487f-8289-8ac2566ca8f0
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Total Sales' = CALCULATE(SUM(Orders[Value]),RELATEDTABLE(Orders),Orders[Type]="Amount")
+		formatString: 0
+		lineageTag: 6031c60d-05a0-4800-856c-154c7f7397eb
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Users = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("C:\Users\hp\Downloads\Users.csv"),[Delimiter=",", Columns=6, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"User_id", Int64.Type}, {"Name", type text}, {"Age", Int64.Type}, {"Gender", type text}, {"Marital Status", type text}, {"Occupation", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
